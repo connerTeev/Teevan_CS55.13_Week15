@@ -44,17 +44,10 @@ export function usePhotoGallery() {
       source: CameraSource.Camera,
       quality: 100,
     });
+    //Discrep. (.now()) -> (.getTime())/repl
     const fileName = Date.now() + '.jpeg';
     const savedFileImage = await savePicture(photo, fileName);
     const newPhotos = [savedFileImage, ...photos];
-    /*const newPhotos = [
-        {
-          filepath: fileName,
-          webviewPath: photo.webPath,
-        },
-        ...photos,
-      ];
-      */
     setPhotos(newPhotos);
     Preferences.set({
       key: PHOTO_STORAGE,
@@ -66,12 +59,14 @@ export function usePhotoGallery() {
     photo: Photo,
     fileName: string
   ): Promise<UserPhoto> => {
+    // Discrep. (| Blob) -> ()/repo
     let base64Data: string | Blob;
     // "hybrid" will detect Cordova or Capacitor;
     if (isPlatform('hybrid')) {
       const file = await Filesystem.readFile({
         path: photo.path!,
       });
+      // Error due to typeScript?
       base64Data = file.data;
     } else {
       base64Data = await base64FromPath(photo.webPath!);
